@@ -35,3 +35,5 @@ yarn run start
 **node-serialport** © Christopher Williams, Released under the [MIT](https://github.com/serialport/node-serialport/blob/master/LICENSE) License.
 
 **scramjet** © Scramjet, Released under the [MIT](https://github.com/signicode/scramjet/blob/master/LICENSE) License.
+
+**layui** © layui, Released under the [MIT](https://github.com/sentsin/layui/blob/master/LICENSE) License.
