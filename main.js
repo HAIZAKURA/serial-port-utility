@@ -5,6 +5,8 @@ const url = require('url')
 
 let mainWindow
 
+app.allowRendererProcessReuse = false
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
