@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 const path = require('path')
 const url = require('url')
@@ -9,6 +9,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    resizable: false,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
@@ -44,4 +46,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+ipcMain.on('window-close', () => {
+  mainWindow.close()
 })
