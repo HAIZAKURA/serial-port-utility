@@ -37,3 +37,5 @@ yarn run start
 **scramjet** © Scramjet, Released under the [MIT](https://github.com/signicode/scramjet/blob/master/LICENSE) License.
 
 **layui** © layui, Released under the [MIT](https://github.com/sentsin/layui/blob/master/LICENSE) License.
+
+**electron** © GitHub Inc, Released under the [MIT](https://github.com/electron/electron/blob/master/LICENSE) License.
