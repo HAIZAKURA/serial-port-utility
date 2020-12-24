@@ -2,16 +2,230 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Serial Port Utility</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <script src="./layui/layui.all.js"></script>
 </head>
-<body style="background: white;">
-    <h1>Hello World!</h1>
-    <p>
-        We are using node <script>document.write(process.versions.node)</script>,
-        Chrome <script>document.write(process.versions.chrome)</script>,
-        and Electron <script>document.write(process.versions.electron)</script>.
-    </p>
-</body>
+<body class="layui-bg-gray" id="app">
+    <div id="drag-area"></div>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-xs4">
+                <div class="layui-card layui-anim layui-anim-fadein" id="card-sp">
+                    <div class="layui-card-body">
+                        <div class="sp-info">
+                            <div class="sp-info-item">
+                                <label class="item-label">Serial Port</label>
+                                <div class="item-input">
+                                    <div class="option">
+                                        <select name="port">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sp-info-item">
+                                <label class="item-label">Baud Rate</label>
+                                <div class="item-input">
+                                    <div class="option">
+                                        <select name="baud">
+                                            <option value="4800">4800</option>
+                                            <option value="9600">9600</option>
+                                            <option value="14400">14400</option>
+                                            <option value="38400">38400</option>
+                                            <option value="57600">57600</option>
+                                            <option value="115200">115200</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sp-info-item">
+                                <label class="item-label">Data Bits</label>
+                                <div class="item-input">
+                                    <div class="option">
+                                        <select name="data">
+                                            <option value="8">8</option>
+                                            <option value="7">7</option>
+                                            <option value="6">6</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sp-info-item">
+                                <label class="item-label">Parity</label>
+                                <div class="item-input">
+                                    <div class="option">
+                                        <select name="parity">
+                                            <option value="none">None</option>
+                                            <option value="even">Even</option>
+                                            <option value="mark">Mark</option>
+                                            <option value="odd">Odd</option>
+                                            <option value="space">Space</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sp-info-item">
+                                <label class="item-label">Stop Bits</label>
+                                <div class="item-input">
+                                    <div class="option">
+                                        <select name="stop">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sp-info-item">
+                                <label class="item-label">RTS&nbsp;/&nbsp;CTS</label>
+                                <div class="item-input">
+                                    <input type="checkbox" name="rtscts" />
+                                </div>
+                            </div>
+                            <hr />
+                        </div>
+                        <hr />
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-xs4">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-fluid" id="sp-btn-refresh" onclick="refreshPorts()">
+                                    <i class="layui-icon layui-icon-refresh"></i>
+                                </button>
+                            </div>
+                            <div class="layui-col-xs8">
+                                <button type="button" class="layui-btn layui-btn-fluid" id="sp-btn-switch" onclick="setSp()">
+                                    <span id="sp-btn-text">OPEN</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card layui-anim layui-anim-fadein" id="card-btn-group">
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-xs4">
+                                <button type="button" class="layui-btn layui-btn-danger layui-btn-fluid" onclick="closeWin()">
+                                    <i class="layui-icon layui-icon-logout"></i>
+                                </button>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <button type="button" class="layui-btn layui-btn-normal layui-btn-fluid">
+                                    <i class="layui-icon layui-icon-export"></i>
+                                </button>
+                            </div>
+                            <div class="layui-col-xs4">
+                                <button type="button" class="layui-btn layui-btn-warm layui-btn-fluid" onclick="clearLog()">
+                                    <i class="layui-icon layui-icon-fonts-clear"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs8">
+                <div class="layui-card layui-anim layui-anim-fadein" id="card-log">
+                    <div class="layui-card-body">
+                        <textarea class="layui-textarea" id="log" rows="23" readonly></textarea>
+                    </div>
+                </div>
+                <div class="layui-card layui-anim layui-anim-fadein" id="card-send">
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-xs10">
+                                <input type="text" autocomplete="off" class="layui-input" id="input-send" autofocus />
+                            </div>
+                            <div class="layui-col-xs2">
+                                <div id="send-btn-div">
+                                    <button type="button" class="layui-btn layui-btn-fluid" id="btn-send" onclick="sendCmd()">
+                                        <i class="layui-icon layui-icon-release"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="./renderer.js"></script>
+</body>
+<style>
+    #app {
+        padding: 1em 0;
+    }
+
+    #log {
+        resize: none;
+    }
+
+    #card-sp, #card-log {
+        height: 31rem;
+    }
+
+    .sp-info {
+        height: 26rem;
+        width: 13.5rem;
+        /*border: 1px solid red;*/
+    }
+
+    #btn-send {
+        display: inline-block;
+    }
+
+    .sp-info-item {
+        display: inline-block;
+        height: 1.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .item-label {
+        display: inline-block;
+        width: 5rem;
+    }
+
+    .item-input {
+        display: inline-block;
+        width: 8rem;
+    }
+
+    .item-input > select {
+        width: 100%;
+    }
+
+    .item-input > input {
+        width: 100%;
+    }
+
+    #drag-area {
+        position: absolute;
+        width: 49.9rem;
+        height: 2rem;
+        top: 0;
+        left: 0;
+        /*border: 1px solid red;*/
+        -webkit-app-region: drag;
+        z-index: -1;
+    }
+</style>
+<style>
+    .option{
+        height: 1.5rem;
+        border-radius: 5px;
+        /*box-shadow: 0 0 5px #ccc;*/
+        border: 1px solid #D2D2D2;
+        position: relative;
+    }
+    .option select{
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 1.5rem;
+        line-height: 1.5rem;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-left: 0.5rem;
+    }
+</style>
 </html>
